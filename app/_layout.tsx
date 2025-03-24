@@ -1,17 +1,27 @@
 import { Stack, Tabs } from 'expo-router';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { RootState, store } from '@redux/store';
+import { Provider } from 'react-redux';
+import { store } from '@redux/redux';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/api/firebase';
-import { setUser, clearUser } from '@/redux/slices/authSlice';
+import { auth } from '@api/firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@redux/redux';
+import { setUser, clearUser } from '@redux/slices/authSlice';
+import { useRouter } from 'expo-router';
 
 export default function RootLayout() {
+  return (
+    <Provider store={store}>
+      <AppNavigator />
+    </Provider>
+  );
+}
+
+function AppNavigator() {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
 
-  // Monitor auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -23,38 +33,34 @@ export default function RootLayout() {
     return () => unsubscribe();
   }, [dispatch]);
 
-  return (
-    <Provider store={store}>
-      {!isAuthenticated ? (
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen
-            name="index"
-            options={{
-              headerShown: true,
-              header: () => <AuthHeader />,
-            }}
-          />
-          <Stack.Screen name="auth/signin" />
-          <Stack.Screen name="auth/signup" />
-        </Stack>
-      ) : (
-        <Tabs
-          screenOptions={{
-            headerShown: true,
-            header: () => <LoggedInHeader />,
-          }}
-        >
-          <Tabs.Screen name="index" options={{ title: 'Home' }} />
-          <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
-          <Tabs.Screen name="favorites" options={{ title: 'Favorites' }} />
-        </Tabs>
-      )}
-    </Provider>
+  return !isAuthenticated ? (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: true,
+          header: () => <AuthHeader />,
+        }}
+      />
+      <Stack.Screen name="auth/signin" />
+      <Stack.Screen name="auth/signup" />
+    </Stack>
+  ) : (
+    <Tabs
+      screenOptions={{
+        headerShown: true,
+        header: () => <LoggedInHeader />,
+      }}
+    >
+      <Tabs.Screen name="index" options={{ title: 'Home' }} />
+      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
+      <Tabs.Screen name="favorites" options={{ title: 'Favorites' }} />
+    </Tabs>
   );
 }
 
-// Header for pre-login
 function AuthHeader() {
+  const router = useRouter();
   return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Soccer MLS</Text>
@@ -70,7 +76,6 @@ function AuthHeader() {
   );
 }
 
-// Header for post-login
 function LoggedInHeader() {
   const { userId } = useSelector((state: RootState) => state.auth);
   const [displayName, setDisplayName] = useState('User');

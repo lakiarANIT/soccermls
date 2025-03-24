@@ -1,18 +1,20 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { Pressable, Text, StyleSheet, ViewStyle } from 'react-native';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
+  style?: ViewStyle; // Add style prop
 }
 
-export default function Button({ title, onPress }: ButtonProps) {
+export default function Button({ title, onPress, style }: ButtonProps) {
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
-        { opacity: pressed ? 0.7 : 1 }, // Basic press feedback
+        style, // Merge custom style
+        { opacity: pressed ? 0.7 : 1 },
       ]}
     >
       <Text style={styles.text}>{title}</Text>
@@ -22,7 +24,7 @@ export default function Button({ title, onPress }: ButtonProps) {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#007AFF', // Primary blue, adjust as needed
+    backgroundColor: '#007AFF',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
