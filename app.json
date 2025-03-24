@@ -8,6 +8,7 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "entryPoint": "node_modules/expo-router/entry", 
     "ios": {
       "supportsTablet": true
     },
@@ -36,6 +37,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "5b575d84-aa9d-4363-a2d1-d1a73516df35"
+      }
+    },
+    "owner": "lakiaranit"
   }
 }
