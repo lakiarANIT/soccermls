@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '@redux/redux';
 import { db } from '@api/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import { Box, Text, ScrollView, HStack, Image } from '@gluestack-ui/themed';
 
 interface Game {
   idEvent: string;
@@ -44,50 +44,58 @@ export default function Favorites() {
     });
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Favorites</Text>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <Box flex={1} bg="$gray100" pt="$4">
+      <Text fontSize="$2xl" fontWeight="$bold" color="$primary900" textAlign="center" mb="$6">
+        Favorites
+      </Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         {favorites.map((game) => (
-          <View key={game.idEvent} style={styles.gameCard}>
-            <View style={styles.teamsContainer}>
-              <View style={styles.team}>
-                <Image source={{ uri: game.strHomeTeamBadge }} style={styles.teamBadge} />
-                <Text style={styles.teamName}>{game.strHomeTeam}</Text>
-              </View>
-              <Text style={styles.vsText}>VS</Text>
-              <View style={styles.team}>
-                <Image source={{ uri: game.strAwayTeamBadge }} style={styles.teamBadge} />
-                <Text style={styles.teamName}>{game.strAwayTeam}</Text>
-              </View>
-            </View>
-            <Text style={styles.dateTime}>{formatDateTime(game.dateEvent, game.strTime)}</Text>
-          </View>
+          <Box
+            key={game.idEvent}
+            bg="$white"
+            mx="$5"
+            mb="$4"
+            borderRadius="$lg"
+            p="$4"
+            shadowColor="$gray900"
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={0.1}
+            shadowRadius={4}
+            elevation={3}
+          >
+            <HStack alignItems="center" justifyContent="space-between" mb="$2">
+              <Box alignItems="center" flex={1}>
+                <Image
+                  source={{ uri: game.strHomeTeamBadge }}
+                  size="sm" // Changed from md to sm (24px)
+                  alt={game.strHomeTeam}
+                  mb="$2"
+                />
+                <Text fontSize="$md" fontWeight="$bold" color="$gray800" textAlign="center">
+                  {game.strHomeTeam}
+                </Text>
+              </Box>
+              <Text fontSize="$lg" fontWeight="$bold" color="$gray600" mx="$2">
+                VS
+              </Text>
+              <Box alignItems="center" flex={1}>
+                <Image
+                  source={{ uri: game.strAwayTeamBadge }}
+                  size="sm" // Changed from md to sm (24px)
+                  alt={game.strAwayTeam}
+                  mb="$2"
+                />
+                <Text fontSize="$md" fontWeight="$bold" color="$gray800" textAlign="center">
+                  {game.strAwayTeam}
+                </Text>
+              </Box>
+            </HStack>
+            <Text fontSize="$sm" color="$gray600" textAlign="center">
+              {formatDateTime(game.dateEvent, game.strTime)}
+            </Text>
+          </Box>
         ))}
       </ScrollView>
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5', paddingTop: 10 },
-  header: { fontSize: 28, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: '#333' },
-  scrollContent: { paddingBottom: 20 },
-  gameCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginBottom: 15,
-    borderRadius: 12,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  teamsContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  team: { alignItems: 'center', flex: 1 },
-  teamBadge: { width: 40, height: 40, marginBottom: 5 },
-  teamName: { fontSize: 16, fontWeight: 'bold', color: '#333', textAlign: 'center' },
-  vsText: { fontSize: 18, fontWeight: 'bold', color: '#888', marginHorizontal: 10 },
-  dateTime: { fontSize: 14, color: '#666', textAlign: 'center' },
-});

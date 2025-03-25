@@ -1,13 +1,13 @@
-import { View, Text } from 'react-native';
+import { Box, Text } from '@gluestack-ui/themed';
 import LoginForm from '@components/auth/LoginForm';
 
 export default function SignInScreen() {
   return (
-    <View style={{ padding: 20, flex: 1, justifyContent: 'center', backgroundColor: '#f5f5f5' }}>
-      <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: '#333' }}>
+    <Box flex={1} bg="$gray100" p="$5" justifyContent="center">
+      <Text fontSize="$2xl" fontWeight="$bold" color="$primary900" textAlign="center" mb="$6">
         Sign In to Soccer MLS
       </Text>
       <LoginForm />
-    </View>
+    </Box>
   );
 }

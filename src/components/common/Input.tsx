@@ -1,5 +1,4 @@
 import { Input as GlueInput, InputField } from '@gluestack-ui/themed';
-import { StyleSheet } from 'react-native';
 
 interface InputProps {
   value: string;
@@ -10,17 +9,15 @@ interface InputProps {
 
 export default function Input({ value, onChangeText, placeholder, secureTextEntry }: InputProps) {
   return (
-    <GlueInput style={styles.input}>
+    <GlueInput borderRadius="$lg" bg="$white" borderColor="$gray300" my="$2">
       <InputField
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         secureTextEntry={secureTextEntry}
+        fontSize="$md"
+        color="$gray800"
       />
     </GlueInput>
   );
 }
-
-const styles = StyleSheet.create({
-  input: { marginVertical: 10, borderRadius: 8 },
-});

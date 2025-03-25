@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '@redux/redux';
-import { FontAwesome } from '@expo/vector-icons';
 import { db } from '@api/firebase';
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { Box, Text, ScrollView, HStack, Image, Input, InputField, Pressable } from '@gluestack-ui/themed';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface Game {
   idEvent: string;
@@ -71,79 +71,86 @@ export default function Home() {
     });
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search by team or league..."
-        value={search}
-        onChangeText={setSearch}
-      />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <Box flex={1} bg="$gray100" pt="$4">
+      <Input mx="$5" my="$4" borderRadius="$lg" bg="$white" borderColor="$gray300">
+        <InputField
+          placeholder="Search by team or league..."
+          value={search}
+          onChangeText={setSearch}
+          fontSize="$sm"
+          color="$gray800"
+        />
+      </Input>
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         {filteredGames.map((game) => (
-          <View key={game.idEvent} style={styles.gameCard}>
-            <View style={styles.leagueContainer}>
-              <Image source={{ uri: game.strLeagueBadge }} style={styles.leagueBadge} />
-              <Text style={styles.leagueName}>{game.strLeague}</Text>
-            </View>
-            <View style={styles.teamsContainer}>
-              <View style={styles.team}>
-                <Image source={{ uri: game.strHomeTeamBadge }} style={styles.teamBadge} />
-                <Text style={styles.teamName}>{game.strHomeTeam}</Text>
-              </View>
-              <Text style={styles.vsText}>VS</Text>
-              <View style={styles.team}>
-                <Image source={{ uri: game.strAwayTeamBadge }} style={styles.teamBadge} />
-                <Text style={styles.teamName}>{game.strAwayTeam}</Text>
-              </View>
-            </View>
-            <Text style={styles.dateTime}>{formatDateTime(game.dateEvent, game.strTime)}</Text>
-            <Text style={styles.venue}>{game.strVenue}</Text>
-            <TouchableOpacity style={styles.favoriteButton} onPress={() => toggleFavorite(game.idEvent)}>
-              <FontAwesome
-                name={favorites.includes(game.idEvent) ? 'star' : 'star-o'}
+          <Box
+            key={game.idEvent}
+            bg="$white"
+            mx="$5"
+            mb="$4"
+            borderRadius="$lg"
+            p="$4"
+            shadowColor="$gray900"
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={0.1}
+            shadowRadius={4}
+            elevation={3}
+          >
+            <HStack alignItems="center" mb="$2">
+              <Image source={{ uri: game.strLeagueBadge }} size="xs" alt={game.strLeague} mr="$2" />
+              <Text fontSize="$sm" fontWeight="$semibold" color="$gray600">
+                {game.strLeague}
+              </Text>
+            </HStack>
+            <HStack alignItems="center" justifyContent="space-between" mb="$2">
+              <Box alignItems="center" flex={1}>
+                <Image
+                  source={{ uri: game.strHomeTeamBadge }}
+                  size="sm" // Changed from md to sm (24px)
+                  alt={game.strHomeTeam}
+                  mb="$2"
+                />
+                <Text fontSize="$md" fontWeight="$bold" color="$gray800" textAlign="center">
+                  {game.strHomeTeam}
+                </Text>
+              </Box>
+              <Text fontSize="$lg" fontWeight="$bold" color="$gray600" mx="$2">
+                VS
+              </Text>
+              <Box alignItems="center" flex={1}>
+                <Image
+                  source={{ uri: game.strAwayTeamBadge }}
+                  size="sm" // Changed from md to sm (24px)
+                  alt={game.strAwayTeam}
+                  mb="$2"
+                />
+                <Text fontSize="$md" fontWeight="$bold" color="$gray800" textAlign="center">
+                  {game.strAwayTeam}
+                </Text>
+              </Box>
+            </HStack>
+            <Text fontSize="$sm" color="$gray600" textAlign="center" mb="$2">
+              {formatDateTime(game.dateEvent, game.strTime)}
+            </Text>
+            <Text fontSize="$xs" color="$gray500" textAlign="center" mb="$2">
+              {game.strVenue}
+            </Text>
+            <Pressable
+              position="absolute"
+              top="$2"
+              right="$2"
+              onPress={() => toggleFavorite(game.idEvent)}
+              sx={{ ':pressed': { opacity: 0.8 } }}
+            >
+              <MaterialIcons
+                name={favorites.includes(game.idEvent) ? 'star' : 'star-border'}
                 size={24}
-                color={favorites.includes(game.idEvent) ? '#FFD700' : '#ccc'}
+                color={favorites.includes(game.idEvent) ? '#FFD700' : '$gray300'}
               />
-            </TouchableOpacity>
-          </View>
+            </Pressable>
+          </Box>
         ))}
       </ScrollView>
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5', paddingTop: 10 },
-  searchInput: {
-    margin: 20,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderColor: '#ddd',
-    borderWidth: 1,
-  },
-  scrollContent: { paddingBottom: 20 },
-  gameCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginBottom: 15,
-    borderRadius: 12,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  leagueContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  leagueBadge: { width: 24, height: 24, marginRight: 8 },
-  leagueName: { fontSize: 14, fontWeight: '600', color: '#555' },
-  teamsContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  team: { alignItems: 'center', flex: 1 },
-  teamBadge: { width: 40, height: 40, marginBottom: 5 },
-  teamName: { fontSize: 16, fontWeight: 'bold', color: '#333', textAlign: 'center' },
-  vsText: { fontSize: 18, fontWeight: 'bold', color: '#888', marginHorizontal: 10 },
-  dateTime: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 5 },
-  venue: { fontSize: 12, color: '#999', textAlign: 'center', marginBottom: 10 },
-  favoriteButton: { position: 'absolute', top: 10, right: 10 },
-});

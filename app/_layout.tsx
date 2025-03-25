@@ -1,7 +1,6 @@
 import { Stack, Tabs } from 'expo-router';
 import { Provider } from 'react-redux';
 import { store } from '@redux/redux';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@api/firebase';
@@ -9,11 +8,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@redux/redux';
 import { setUser, clearUser } from '@redux/slices/authSlice';
 import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
+import { GluestackUIProvider, Box, Text, Pressable, HStack } from '@gluestack-ui/themed';
+import { config } from '@gluestack-ui.config';
 
 export default function RootLayout() {
   return (
     <Provider store={store}>
-      <AppNavigator />
+      <GluestackUIProvider config={config}>
+        <AppNavigator />
+      </GluestackUIProvider>
     </Provider>
   );
 }
@@ -50,11 +54,56 @@ function AppNavigator() {
       screenOptions={{
         headerShown: true,
         header: () => <LoggedInHeader />,
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          borderTopWidth: 0,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          height: 60,
+          paddingBottom: 5,
+          paddingTop: 5,
+        },
+        tabBarActiveTintColor: '$primary700', // Vibrant purple
+        tabBarInactiveTintColor: '$primary300', // Soft purple
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          marginBottom: 2,
+        },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Home' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
-      <Tabs.Screen name="favorites" options={{ title: 'Favorites' }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="person" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="favorites"
+        options={{
+          title: 'Favorites',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="favorite" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen name="auth/signin" options={{ href: null }} />
+      <Tabs.Screen name="auth/signup" options={{ href: null }} />
     </Tabs>
   );
 }
@@ -62,17 +111,54 @@ function AppNavigator() {
 function AuthHeader() {
   const router = useRouter();
   return (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>Soccer MLS</Text>
-      <View style={styles.headerButtons}>
-        <TouchableOpacity style={styles.headerButton} onPress={() => router.push('/auth/signin')}>
-          <Text style={styles.headerButtonText}>Sign In</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.headerButton} onPress={() => router.push('/auth/signup')}>
-          <Text style={styles.headerButtonText}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <Box
+      bg="$primary900" // Deep purple
+      px="$4"
+      py="$3"
+      pt="$10" // Extra padding for status bar
+      flexDirection="row"
+      justifyContent="space-between"
+      alignItems="center"
+      shadowColor="#000"
+      shadowOffset={{ width: 0, height: 2 }}
+      shadowOpacity={0.2}
+      shadowRadius={4}
+      elevation={5}
+    >
+      <Text fontSize="$xl" fontWeight="$bold" color="$white">
+        Soccer MLS
+      </Text>
+      <HStack space="md">
+        <Pressable
+          bg="$primary500" // Lighter purple
+          px="$4"
+          py="$2"
+          borderRadius="$md"
+          onPress={() => router.push('/auth/signin')}
+          sx={{
+            ':pressed': { opacity: 0.8 }, // Correct GlueStack syntax for pressed state
+          }}
+        >
+          <Text fontSize="$sm" fontWeight="$semibold" color="$white">
+            Sign In
+          </Text>
+        </Pressable>
+        <Pressable
+          bg="$primary500"
+          px="$4"
+          py="$2"
+          borderRadius="$md"
+          onPress={() => router.push('/auth/signup')}
+          sx={{
+            ':pressed': { opacity: 0.8 }, // Correct GlueStack syntax
+          }}
+        >
+          <Text fontSize="$sm" fontWeight="$semibold" color="$white">
+            Sign Up
+          </Text>
+        </Pressable>
+      </HStack>
+    </Box>
   );
 }
 
@@ -87,43 +173,26 @@ function LoggedInHeader() {
   }, [userId]);
 
   return (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>Soccer MLS</Text>
-      <Text style={styles.userName}>Welcome, {displayName}</Text>
-    </View>
+    <Box
+      bg="$primary900" // Deep purple
+      px="$4"
+      py="$3"
+      pt="$10"
+      flexDirection="row"
+      justifyContent="space-between"
+      alignItems="center"
+      shadowColor="#000"
+      shadowOffset={{ width: 0, height: 2 }}
+      shadowOpacity={0.2}
+      shadowRadius={4}
+      elevation={5}
+    >
+      <Text fontSize="$xl" fontWeight="$bold" color="$white">
+        Soccer MLS
+      </Text>
+      <Text fontSize="$md" fontWeight="$semibold" color="$primary100">
+        Welcome, {displayName}
+      </Text>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 15,
-    backgroundColor: '#007AFF',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  headerButtons: {
-    flexDirection: 'row',
-  },
-  headerButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    marginLeft: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-  },
-  headerButtonText: {
-    color: '#007AFF',
-    fontWeight: '600',
-  },
-  userName: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: '600',
-  },
-});
